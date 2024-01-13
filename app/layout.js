@@ -6,7 +6,7 @@ import { Providers } from './redux/provider'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import MusicPlayerWrap from './components/MusicPlayerWrap'
-
+import { SpeedInsights } from "@vercel/speed-insights/next"
 export const metadata = {
   title: 'Tunewave: Listen the music in your way 🎶',
   description:
@@ -30,6 +30,7 @@ export default function RootLayout({ children }) {
               <div className="flex-1 h-fit pb-10">
                 <Providers>
                   {children}
+                  <SpeedInsights/>
                   <div className="fixed bottom-0 left-0 w-full h-30  bg-gray-500">
                     <MusicPlayerWrap />
                     <div className="md:hidden">
