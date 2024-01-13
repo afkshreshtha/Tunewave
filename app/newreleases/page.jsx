@@ -9,7 +9,8 @@ const NewReleases = () => {
   const { activeSong, isPlaying } = useSelector((state) => state.player)
   const [click, setClick] = useState(false)
   const [selectedLanguages, setSelectedLanguages] = useState([])
-  const language = localStorage.getItem('selectedLanguages')
+  const [language, setLanguage] = useState('')
+  const [isClient, setIsClient] = useState(false)
   const { data, isFetching, error } = useGetTopChartsQuery({
     language,
   })
@@ -32,7 +33,17 @@ const NewReleases = () => {
 
     setSelectedLanguages(updatedLanguages)
   }
-
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+  useEffect(() => {
+    if (isClient) {
+      // Your client-side code that uses localStorage
+      const storedLanguages = localStorage.getItem('selectedLanguages')
+      setLanguage(storedLanguages)
+      // Rest of the client-side code...
+    }
+  }, [selectedLanguages, isClient])
   return (
     <div className=" flex flex-col">
       <div className="w-full flex justify-between items-center sm:flex-row flex-col mt-4 mb-10">
@@ -56,9 +67,9 @@ const NewReleases = () => {
           </section>
           <section>
             {click && (
-              <form className="mt-4">
+              <form className="mt-4 grid grid-cols-2 gap-4 ">
                 <section className="bg-gray-700 p-4 rounded">
-                  <ul>
+                  <ul className="grid grid-cols-2 gap-4">
                     <li className="text-white mb-2">
                       <label>
                         <input
@@ -81,6 +92,30 @@ const NewReleases = () => {
                           className="mr-2"
                         />
                         English
+                      </label>
+                    </li>
+                    <li className="text-white mb-2">
+                      <label>
+                        <input
+                          type="checkbox"
+                          value="Punjabi"
+                          checked={language.includes('punjabi')}
+                          onChange={() => handleLanguageClick('Punjabi')}
+                          className="mr-2"
+                        />
+                        Punjabi
+                      </label>
+                    </li>
+                    <li className="text-white mb-2">
+                      <label>
+                        <input
+                          type="checkbox"
+                          value="Harayanvi"
+                          checked={language.includes('harayanvi')}
+                          onChange={() => handleLanguageClick('Harayanvi')}
+                          className="mr-2"
+                        />
+                        Harayanvi
                       </label>
                     </li>
                     {/* Add more languages as needed */}

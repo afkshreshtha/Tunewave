@@ -7,10 +7,11 @@ import { useEffect, useState } from 'react'
 import { RiArrowDownSLine, RiArrowUpSLine } from 'react-icons/ri'
 
 const Charts = () => {
+  const [isClient, setIsClient] = useState(false)
   const { activeSong, isPlaying } = useSelector((state) => state.player)
   const [click, setClick] = useState(false)
   const [selectedLanguages, setSelectedLanguages] = useState([])
-  const language = localStorage.getItem('selectedLanguages')
+  const [language,setLanguage] = useState('')
   const { data, isFetching, error } = useGetTopChartsQuery({
     language,
   })
@@ -19,6 +20,9 @@ const Charts = () => {
     if (storedLanguages === null) {
       localStorage.setItem('selectedLanguages', 'hindi')
     }
+  }, [])
+  useEffect(() => {
+    setIsClient(true)
   }, [])
 
   const handleLanguageClick = (language) => {
@@ -39,7 +43,14 @@ const Charts = () => {
 
     setSelectedLanguages(updatedLanguages)
   }
-
+  useEffect(() => {
+    if (isClient) {
+      // Your client-side code that uses localStorage
+      const storedLanguages = localStorage.getItem('selectedLanguages');
+      setLanguage(storedLanguages)
+      // Rest of the client-side code...
+    }
+  }, [selectedLanguages,isClient]);
   return (
     <div className=" flex flex-col">
       <div className="w-full flex justify-between items-center sm:flex-row flex-col mt-4 mb-10">
@@ -65,37 +76,61 @@ const Charts = () => {
             </section>
             <section>
               {click && (
-                <form className="mt-4">
-                  <section className="bg-gray-700 p-4 rounded">
-                    <ul>
-                      <li className="text-white mb-2">
-                        <label>
-                          <input
-                            type="checkbox"
-                            value="Hindi"
-                            checked={language.includes('hindi')}
-                            onChange={() => handleLanguageClick('Hindi')}
-                            className="mr-2"
-                          />
-                          Hindi
-                        </label>
-                      </li>
-                      <li className="text-white mb-2">
-                        <label>
-                          <input
-                            type="checkbox"
-                            value="English"
-                            checked={language.includes('english')}
-                            onChange={() => handleLanguageClick('English')}
-                            className="mr-2"
-                          />
-                          English
-                        </label>
-                      </li>
-                      {/* Add more languages as needed */}
-                    </ul>
-                  </section>
-                </form>
+                <form className="mt-4 grid grid-cols-2 gap-4 ">
+                <section className="bg-gray-700 p-4 rounded">
+                  <ul className="grid grid-cols-2 gap-4">
+                    <li className="text-white mb-2">
+                      <label>
+                        <input
+                          type="checkbox"
+                          value="Hindi"
+                          checked={language.includes('hindi')}
+                          onChange={() => handleLanguageClick('Hindi')}
+                          className="mr-2"
+                        />
+                        Hindi
+                      </label>
+                    </li>
+                    <li className="text-white mb-2">
+                      <label>
+                        <input
+                          type="checkbox"
+                          value="English"
+                          checked={language.includes('english')}
+                          onChange={() => handleLanguageClick('English')}
+                          className="mr-2"
+                        />
+                        English
+                      </label>
+                    </li>
+                    <li className="text-white mb-2">
+                      <label>
+                        <input
+                          type="checkbox"
+                          value="Punjabi"
+                          checked={language.includes('punjabi')}
+                          onChange={() => handleLanguageClick('Punjabi')}
+                          className="mr-2"
+                        />
+                        Punjabi
+                      </label>
+                    </li>
+                    <li className="text-white mb-2">
+                      <label>
+                        <input
+                          type="checkbox"
+                          value="Harayanvi"
+                          checked={language.includes('harayanvi')}
+                          onChange={() => handleLanguageClick('Harayanvi')}
+                          className="mr-2"
+                        />
+                        Harayanvi
+                      </label>
+                    </li>
+                    {/* Add more languages as needed */}
+                  </ul>
+                </section>
+              </form>
               )}
             </section>
           </div>

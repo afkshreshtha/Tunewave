@@ -12,8 +12,7 @@ const Discover = () => {
   const [click, setClick] = useState(false)
   const { activeSong, isPlaying } = useSelector((state) => state.player)
   const [selectedLanguages, setSelectedLanguages] = useState([])
-  const language = localStorage.getItem('selectedLanguages')
-  
+  const [language,setLanguage] = useState('')
   const { data, isFetching, error } = useGetTopChartsQuery({
     language,
   })
@@ -45,6 +44,7 @@ const Discover = () => {
   }
 
   const [user, setUser] = useState({})
+
   useEffect(() => {
     const getUserData = async () => {
       await supabase.auth.getUser().then((value) => {
@@ -55,11 +55,20 @@ const Discover = () => {
     }
     getUserData()
   }, [])
+
   useEffect(() => {
     setIsClient(true)
   }, [])
 
- 
+   useEffect(() => {
+    if (isClient) {
+      // Your client-side code that uses localStorage
+      const storedLanguages = localStorage.getItem('selectedLanguages');
+      setLanguage(storedLanguages)
+      // Rest of the client-side code...
+    }
+  }, [selectedLanguages,isClient]);
+  
   return (
     <>
       <div className=" flex flex-col">
