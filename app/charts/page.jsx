@@ -3,31 +3,102 @@ import SongCard from './components/SongCard'
 import { useGetTopChartsQuery } from '../redux/services/jioSavaanapi'
 import { useSelector } from 'react-redux'
 import ClipLoader from 'react-spinners/ClipLoader'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { RiArrowDownSLine, RiArrowUpSLine } from 'react-icons/ri'
 
 const Charts = () => {
   const { activeSong, isPlaying } = useSelector((state) => state.player)
-  const [language, setLanguage] = useState('hindi')
+  const [click, setClick] = useState(false)
+  const [selectedLanguages, setSelectedLanguages] = useState([])
+  const language = localStorage.getItem('selectedLanguages')
   const { data, isFetching, error } = useGetTopChartsQuery({
     language,
   })
-  const handleSelectChange = (e) => {
-    setLanguage(e.target.value)
+  useEffect(() => {
+    const storedLanguages = localStorage.getItem('selectedLanguages')
+    if (storedLanguages === null) {
+      localStorage.setItem('selectedLanguages', 'hindi')
+    }
+  }, [])
+
+  const handleLanguageClick = (language) => {
+    const isSelected = selectedLanguages.includes(language)
+    let updatedLanguages
+
+    if (isSelected) {
+      updatedLanguages = selectedLanguages.filter((lang) => lang !== language)
+    } else {
+      updatedLanguages = [...selectedLanguages, language]
+    }
+
+    // Save selected languages to local storage
+    localStorage.setItem(
+      'selectedLanguages',
+      updatedLanguages.join(',').toLowerCase(),
+    )
+
+    setSelectedLanguages(updatedLanguages)
   }
+
   return (
     <div className=" flex flex-col">
       <div className="w-full flex justify-between items-center sm:flex-row flex-col mt-4 mb-10">
-        <h2 className="font-bold text-3xl text-white text-left">Top Charts</h2>
-        <div className="p-4">
-          <select
-            onChange={handleSelectChange}
-            className="w-full p-2 border rounded-md"
-          >
-            <option value="hindi">Hindi</option>
-            <option value="english">English</option>
-            <option value="punjabi">Punjabi</option>
-          </select>
-        </div>
+      <h2 className="font-bold text-3xl text-white text-left mb-10">
+            Top Charts
+          </h2>
+          <div>
+            <section className="mb-10 mr-40">
+              <h1
+                className="text-white cursor-pointer flex"
+                onClick={() => setClick(!click)}
+              >
+                Music Languages{' '}
+                <span className="pt-1 ml-1">
+                  {click ? (
+                    <RiArrowUpSLine className="text-white" size={20} />
+                  ) : (
+                    <RiArrowDownSLine className="text-white" size={20} />
+                  )}
+                </span>
+              </h1>
+              <span className="text-white flex capitalize">{language}</span>
+            </section>
+            <section>
+              {click && (
+                <form className="mt-4">
+                  <section className="bg-gray-700 p-4 rounded">
+                    <ul>
+                      <li className="text-white mb-2">
+                        <label>
+                          <input
+                            type="checkbox"
+                            value="Hindi"
+                            checked={language.includes('hindi')}
+                            onChange={() => handleLanguageClick('Hindi')}
+                            className="mr-2"
+                          />
+                          Hindi
+                        </label>
+                      </li>
+                      <li className="text-white mb-2">
+                        <label>
+                          <input
+                            type="checkbox"
+                            value="English"
+                            checked={language.includes('english')}
+                            onChange={() => handleLanguageClick('English')}
+                            className="mr-2"
+                          />
+                          English
+                        </label>
+                      </li>
+                      {/* Add more languages as needed */}
+                    </ul>
+                  </section>
+                </form>
+              )}
+            </section>
+          </div>
       </div>
       {isFetching && <ClipLoader color="#fff" />}
       <div className=" flex flex-wrap sm:justify-start justify-center gap-8 mb-20 ">
