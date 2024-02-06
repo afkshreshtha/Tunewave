@@ -19,7 +19,7 @@ const useSongSearch = (query, pageNumber,searchThing) => {
     setError(false)
     axios
       .get(
-        `https://saavn.me/search/${searchThing}?query=${query}&page=${pageNumber}&limit=10`,
+        `https://saavn.dev/search/${searchThing}?query=${query}&page=${pageNumber}&limit=10`,
       )
       .then((res) => {
         setSongs((prevSongs) => {
