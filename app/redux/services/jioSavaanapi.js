@@ -5,7 +5,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const jioSavaanapi = createApi({
   reducerPath: "jioSavaanapi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://saavn.me",
+    baseUrl: "https://saavn.dev",
   }),
   endpoints: (builder) => ({
     getTopCharts: builder.query({
