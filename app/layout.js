@@ -16,6 +16,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
+    <meta name="google-site-verification" content="QibisYWcAxZwed8-_w-2OVseaL58KAxSe7Jb2A6wXLQ" />
         <div className="relative flex">
           {/* Sidebar */}
           <div className="fixed top-0 left-0 h-full">
