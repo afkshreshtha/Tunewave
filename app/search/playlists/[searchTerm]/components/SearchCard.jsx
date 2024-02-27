@@ -20,7 +20,10 @@ const SearchCard = ({ song, isPlaying, activeSong, data, i }) => {
     const decodedString = str?.replace(/&quot;/g, '"')
     return decodedString
   }
-
+  const handlePlayMusic = () => {
+    router.push(`${'/playlist'}/${song.id}`),
+      localStorage.setItem('playMusic', 0)
+  }
   let str = song.name || song.title
   str = decodeHTMLString(str)
   const router = useRouter()
@@ -34,13 +37,7 @@ const SearchCard = ({ song, isPlaying, activeSong, data, i }) => {
               ? 'flex bg-black bg-opacity-70'
               : 'hidden'
           }`}
-          onClick={() =>
-            router.push(
-              `${'/playlist'}/${
-                song.id
-              }`,
-            )
-          }
+          onClick={handlePlayMusic}
         >
           <PlayPause
             isPlaying={isPlaying}
