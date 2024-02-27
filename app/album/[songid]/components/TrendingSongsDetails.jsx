@@ -23,6 +23,11 @@ const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
       dispatch(playPause(true))
     }
   }
+    if (localStorage.getItem('playMusic', 0)) {
+    dispatch(setActiveSong({ song, data, i }))
+    dispatch(playPause(true))
+    localStorage.removeItem('playMusic')
+  }
   const decodeHTMLString = (str) => {
     const decodedString = str?.replace(/&quot;/g, '"')
     return decodedString
