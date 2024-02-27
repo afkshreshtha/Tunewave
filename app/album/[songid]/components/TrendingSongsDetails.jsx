@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { supabase } from '../../../utils/supabase'
 import { AiFillHeart, AiOutlineHeart, AiOutlineDownload } from 'react-icons/ai'
-
+import gif from '../../../../public/music.gif'
 const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
   const dispatch = useDispatch()
   const [LikedSongsid, setLikedSongsid] = useState([])
@@ -152,10 +152,10 @@ const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
         <div onClick={handleButtonClick} className="cursor-pointer">
           <div className="w-16 h-16 md:w-20 md:h-20">
             <Image
-            unoptimized={true}
+              unoptimized={true}
               src={
                 activeSong?.id === song.id && isPlaying === true
-                  ? 'https://th.bing.com/th/id/R.39be84790f16c293e001b26c367e9c87?rik=hkhhkjmeuq4DWg&riu=http%3a%2f%2fcdn.wallpapersafari.com%2f60%2f77%2fnpx4Pk.gif&ehk=LTFLE4ndfMIkZkcS7sW1IJzeJghsooKbl%2fHNBVKsZWM%3d&risl=&pid=ImgRaw&r=0'
+                  ? gif
                   : song.image[2].link
               }
               alt="img"
