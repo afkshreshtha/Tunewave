@@ -21,7 +21,7 @@ const SearchCard = ({ song, isPlaying, activeSong, data, i }) => {
     return decodedString
   }
   const handlePlayMusic = () => {
-    router.push(`${'album'}/${song.id}`),
+    router.push(`${'/album'}/${song.id}`),
       localStorage.setItem('playMusic', 0)
   }
   let str = song.name || song.title
