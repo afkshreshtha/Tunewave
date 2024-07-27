@@ -1,0 +1,35 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "incremental": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  },
+  "include": [
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    "**/*.ts",
+    "**/*.tsx"
+, "app/playlist/page.jsx", "app/playlist/[songId]/page.jsx", "app/charts/page.jsx", "app/newreleases/page.jsx", "app/sign-in/page.jsx", "app/likedsongs/page.jsx", "app/search/albums/[searchTerms]/page.jsx", "app/components/Dropdown.jsx"  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
