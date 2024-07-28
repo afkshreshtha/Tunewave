@@ -15,7 +15,7 @@ export const jioSavaanapi = createApi({
       query: ({ songid }) => `/playlists?id=${songid}`,
     }),
     getTopSongsDetails: builder.query({
-      query: ({ songid }) => `/songs?id=${songid}`,
+      query: ({ songid }) => `/songs/${songid}`,
     }),
     getNewReleasesDetails: builder.query({
       query: ({ songid }) => `/albums?id=${songid}`,

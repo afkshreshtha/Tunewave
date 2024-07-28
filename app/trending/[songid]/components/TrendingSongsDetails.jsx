@@ -13,7 +13,7 @@ const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
   const [click, setClick] = useState(false)
 
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false)
-console.log(song)
+
   const handleButtonClick = () => {
     setClick((prevState) => !prevState) // Toggle the value of 'click'
     if (click === false) {

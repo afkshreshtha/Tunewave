@@ -61,7 +61,7 @@ const SongCard = ({ song, isPlaying, activeSong, data, i }) => {
           width={1000}
           height={1000}
           alt="song_img"
-          src={song.image[2]?.link}
+          src={song.image[2]?.url}
           className="w-full h-full rounded-lg"
         />
       </div>
