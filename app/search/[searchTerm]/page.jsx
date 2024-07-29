@@ -51,21 +51,18 @@ const Search = () => {
       {loading && <ClipLoader color="#fff" />}
       {songs.map((song, index) => {
         if (songs.length === index + 1) {
-          return (
-           
-           
+          return (          
             <div key={song.id} ref={lastBookElementRef}>
               <SearchCard
                 key={song.id}
                 song={song}
                 isPlaying={isPlaying}
                 activeSong={activeSong}
-                data={song}
+                data={songs}
                 i={index}
           
               />
             </div>
-      
           )
         } else
           return (
@@ -74,7 +71,7 @@ const Search = () => {
               song={song}
               isPlaying={isPlaying}
               activeSong={activeSong}
-              data={song}
+              data={songs}
               i={index}
             />
           )

@@ -1,17 +1,17 @@
 'use client'
 import { useDispatch } from 'react-redux'
-import { playPause, setActiveSong } from '../../../redux/Features/playerSlice'
-import { useEffect, useState } from 'react'
+import { playPause, setActiveSong } from '../../../../redux/Features/playerSlice'
+import { useEffect,  useState } from 'react'
 import Image from 'next/image'
-import { supabase } from '../../../utils/supabase'
-import gif from "../../../../public/music.gif"
-import { AiFillHeart, AiOutlineDownload, AiOutlineHeart } from 'react-icons/ai'
-const PlaylistSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
+import { supabase } from '../../../../utils/supabase'
+import { AiFillHeart, AiOutlineHeart, AiOutlineDownload } from 'react-icons/ai'
+import gif from '../../../../../public/music.gif'
+const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
   const dispatch = useDispatch()
   const [LikedSongsid, setLikedSongsid] = useState([])
   const [IslikedSong, setIsLikedSong] = useState(false)
   const [click, setClick] = useState(false)
-  const [isFetching, setIsFetching] = useState(true)
+
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false)
 
   const handleButtonClick = () => {
@@ -35,6 +35,7 @@ const PlaylistSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
 
   let str = song?.name
   str = decodeHTMLString(str)
+
   const uploadSong = async (song) => {
     const user = await supabase.auth.getUser()
     const formattedSongs = {
@@ -48,7 +49,6 @@ const PlaylistSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
     uploadSong(song)
     setIsLikedSong(true)
   }
-
   useEffect(() => {
     async function fetchLikedSongs() {
       try {
@@ -63,16 +63,13 @@ const PlaylistSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
         } else {
           setLikedSongsid(data)
         }
-
-        setIsFetching(false)
       } catch (error) {
         console.error('Error:', error.message)
-        setIsFetching(false)
       }
     }
-
     fetchLikedSongs()
-  }, [isFetching])
+  }, [])
+
   const handleLikeClick = async (songid) => {
     const user = await supabase.auth.getUser()
     try {
@@ -97,7 +94,8 @@ const PlaylistSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
 
   const l = LikedSongsid?.map((song) => song?.songid)
   const a = l?.includes(song?.id)
-  const downloadURL = song.downloadUrl[4].link
+
+  const downloadURL = song.downloadUrl[4].url
   const handleDownload = async () => {
     const response = await fetch(downloadURL)
     const blob = await response.blob()
@@ -119,9 +117,12 @@ const PlaylistSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
     fetchSession()
   }, [])
 
+
+
+
   return (
-    <div class="mt-10 mb-10 flex items-center justify-between mr-4">
-      <div class="flex items-center">
+    <div className="mt-10 mb-10 flex items-center justify-between mr-4">
+      <div className="flex items-center">
         <div
           onClick={handleButtonClick}
           className={`cursor-pointer mr-4 ${
@@ -134,9 +135,10 @@ const PlaylistSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
         </div>
         <div className="flex flex-wrap">{song.primaryArtists}</div>
       </div>
-      <div class="flex items-center">
+
+      <div className="flex items-center">
         {!isUserLoggedIn && (
-          <div className="text-white mr-4">
+          <div className="text-white mr-2 cursor-pointer">
             {IslikedSong || a ? (
               <AiFillHeart onClick={handleLikeSong} />
             ) : (
@@ -151,7 +153,7 @@ const PlaylistSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
           <AiOutlineDownload size={20} />
         </div>
         <div onClick={handleButtonClick} className="cursor-pointer">
-        <div className="w-16 h-16 md:w-20 md:h-20">
+          <div className="w-16 h-16 md:w-20 md:h-20">
             <Image
               unoptimized={true}
               src={
@@ -170,4 +172,4 @@ const PlaylistSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
     </div>
   )
 }
-export default PlaylistSongsDetails
+export default TrendingSongsDetails

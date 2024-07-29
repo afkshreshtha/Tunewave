@@ -1,23 +1,33 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import SongCard from './components/SongCard'
-import { useGetTopChartsQuery } from './redux/services/jioSavaanapi'
+import usePlaylist from './hooks/usePlaylist'
 import { useSelector } from 'react-redux'
 import ClipLoader from 'react-spinners/ClipLoader'
 import { supabase } from './utils/supabase.js'
 import Dropdown from './components/Dropdown' // Import the Dropdown component
 
 const Discover = () => {
-  const [isClient, setIsClient] = useState(false)
+  const [page, setPage] = useState(1)
   const [selectedQuery, setSelectedQuery] = useState('Pop') // State for selected query
-
+  const { songs, hasMore, loading, error } = usePlaylist(selectedQuery, page)
   const { activeSong, isPlaying } = useSelector((state) => state.player)
-  const { data, isFetching, error } = useGetTopChartsQuery({
-    query: selectedQuery, // Use the selected query
-  })
 
-  const [user, setUser] = useState({})
+  const observer = useRef()
+  const lastBookElementRef = useCallback(
+    (node) => {
+      if (loading) return
+      if (observer.current) observer.current.disconnect()
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setPage((prevPage) => prevPage + 1)
+        }
+      })
+      if (node) observer.current.observe(node)
+    },
+    [loading, hasMore],
+  )
 
   useEffect(() => {
     const getUserData = async () => {
@@ -30,32 +40,14 @@ const Discover = () => {
     getUserData()
   }, [])
 
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
+  const handleOptionSelect = (option) => {
+    setSelectedQuery(option)
+    setPage(1)
+  }
 
   return (
     <>
       <div className="flex flex-col items-center">
-        {isClient && (
-          <div>
-            <script
-              async
-              src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8166123895280023"
-              crossOrigin="anonymous"
-            ></script>
-            <ins
-              className="adsbygoogle"
-              style={{ display: 'block' }}
-              data-ad-client="ca-pub-8166123895280023"
-              data-ad-slot="5552238212"
-              data-ad-format="auto"
-              data-full-width-responsive="true"
-            ></ins>
-            <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
-          </div>
-        )}
-
         <div className="w-full flex justify-between items-center sm:flex-row flex-col mt-4">
           <h2 className="font-bold text-3xl text-white text-left mb-10">
             Discover
@@ -82,22 +74,39 @@ const Discover = () => {
               'Instrumental',
             ]} // Options for the dropdown
             selectedOption={selectedQuery}
-            onOptionSelect={setSelectedQuery}
+            onOptionSelect={handleOptionSelect}
           />
         </div>
 
-        {isFetching && <ClipLoader color="#fff" />}
+        {loading && <ClipLoader color="#fff" />}
         <div className="flex flex-wrap justify-center gap-8 mb-20">
-          {data?.data.results.map((song, i) => (
-            <SongCard
-              key={song.id}
-              song={song}
-              i={i}
-              isPlaying={isPlaying}
-              activeSong={activeSong}
-              data={data?.data.results}
-            />
-          ))}
+          {songs.map((song, index) => {
+            if (songs.length === index + 1) {
+              return (
+                <div key={song.id} ref={lastBookElementRef}>
+                  <SongCard
+                    key={song.id}
+                    song={song}
+                    isPlaying={isPlaying}
+                    activeSong={activeSong}
+                    data={song}
+                    i={index}
+                  />
+                </div>
+              )
+            } else {
+              return (
+                <SongCard
+                  key={song.id}
+                  song={song}
+                  isPlaying={isPlaying}
+                  activeSong={activeSong}
+                  data={song}
+                  i={index}
+                />
+              )
+            }
+          })}
         </div>
       </div>
     </>
