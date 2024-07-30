@@ -44,6 +44,7 @@ const MusicPlayer = () => {
   };
 
   const handlePrevSong = () => {
+    dispatch(playPause(false));
     if (currentIndex === 0) {
       dispatch(prevSong(currentSongs.length - 1));
     } else if (shuffle) {

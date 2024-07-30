@@ -1,8 +1,10 @@
 'use client'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 import React from 'react'
 
 const Track = ({ isPlaying, isActive, activeSong }) => {
+  const router = useRouter()
   const decodeHTMLString = (str) => {
     const decodedString = str?.replace(/&quot;/g, '"')
     return decodedString
@@ -25,11 +27,11 @@ const Track = ({ isPlaying, isActive, activeSong }) => {
           className="rounded-full"
         />
       </div>
-      <div className="w-[50%]">
-        <p className="truncate text-white font-bold text-lg">
+      <div className="w-[50%] " >
+        <p className="truncate text-white font-bold cursor-pointer text-lg"onClick={()=>router.push(`/song/${activeSong.id}`)}>
           {str ? str : 'No active Song'}
         </p>
-        <p className="truncate text-gray-300">
+        <p className="truncate cursor-pointer text-gray-300"onClick={()=>router.push(`/song/${activeSong.id}`)}>
           {activeSong?.subtitle || activeSong?.year
             ? activeSong?.subtitle || activeSong?.year
             : 'No active Song'}
