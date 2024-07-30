@@ -27,7 +27,7 @@ const SongCard = ({ song, isPlaying, activeSong, data, i }) => {
   const router = useRouter()
 
   const handlePlayMusic = ()=>{
-    router.push(`${'playlist'}/${song.id}/${song.songCount}`)
+    router.push(`/${'playlist'}/${song.id}/${song.songCount}`)
     localStorage.setItem('playMusic',0)
   }
   return (
@@ -60,7 +60,7 @@ const SongCard = ({ song, isPlaying, activeSong, data, i }) => {
       </div>
 
       <div className="mt-4 flex flex-col">
-        <p className="font-semibold text-lg text-white truncate" onClick={() => router.push(`${'playlist'}/${song.id}/${song.songCount}`)}>{str}</p>
+        <p className="font-semibold text-lg text-white truncate" onClick={() => router.push(`/${'playlist'}/${song.id}/${song.songCount}`)}>{str}</p>
         <p className="text-sm truncate text-gray-300 mt-1">
           {song?.artists?.map((e) => e?.name) || song.subtitle}
         </p>
