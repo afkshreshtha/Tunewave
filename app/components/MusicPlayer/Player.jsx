@@ -16,6 +16,7 @@ const Player = ({
   const dispatch = useDispatch()
   const { currentIndex } = useSelector((state) => state.player)
   const [shuffle, setshuffle] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
 
   useEffect(() => {
     if (ref.current) {
@@ -42,12 +43,11 @@ const Player = ({
   }, [seekTime])
 
   useEffect(() => {
-    const artists = activeSong?.artists.primary.map((e) => e?.name)
+    const artists = activeSong?.artists?.primary?.map((e) => e?.name)
     if (navigator.mediaSession) {
       navigator.mediaSession.metadata = new MediaMetadata({
         title: activeSong?.name || 'Unknown Title',
         artist: artists || 'Unknown Artist',
-        album: activeSong?.album.name || 'Unknown Album',
         artwork: [
           {
             src: activeSong?.image[2].url || 'default-cover.jpg',
@@ -72,14 +72,35 @@ const Player = ({
       })
 
       navigator.mediaSession.setActionHandler('seekto', (event) => {
-        if (event.fastSeek && 'fastSeek' in ref.current) {
-          ref.current.fastSeek(event.seekTime)
-        } else {
-          ref.current.currentTime = event.seekTime
+        if (ref.current) {
+          if (event.fastSeek && 'fastSeek' in ref.current) {
+            ref.current.fastSeek(event.seekTime)
+          } else {
+            ref.current.currentTime = event.seekTime
+          }
+          if (navigator.mediaSession) {
+            navigator.mediaSession.setPositionState({
+              duration: isFinite(ref.current.duration) ? ref.current.duration : 0,
+              playbackRate: ref.current.playbackRate,
+              position: ref.current.currentTime,
+            })
+          }
         }
       })
     }
   }, [activeSong, dispatch])
+
+  const handleTimeUpdate = (e) => {
+    // setCurrentTime(e.target.currentTime)
+    onTimeUpdate(e)
+    if (navigator.mediaSession) {
+      navigator.mediaSession.setPositionState({
+        duration: isFinite(ref.current.duration) ? ref.current.duration : 0,
+        playbackRate: ref.current.playbackRate,
+        position: ref.current.currentTime,
+      })
+    }
+  }
 
   useEffect(() => {
     const handleLoadedData = () => {
@@ -114,7 +135,7 @@ const Player = ({
       ref={ref}
       loop={repeat}
       onEnded={onEnded}
-      onTimeUpdate={onTimeUpdate}
+      onTimeUpdate={handleTimeUpdate}
       onLoadedData={onLoadedData}
       onError={(e) => console.error('Audio playback error:', e)}
     />
@@ -122,4 +143,3 @@ const Player = ({
 }
 
 export default Player
-
