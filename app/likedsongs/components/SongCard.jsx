@@ -13,7 +13,16 @@ const SongCard = ({ song, isPlaying, activeSong, data, i }) => {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false)
   const [isLikedSong, setIsLikedSong] = useState(false)
   const [likedSongsId, setLikedSongsId] = useState([])
-
+  const [click, setClick] = useState(false)
+  const handleButtonClick = () => {
+    setClick((prevState) => !prevState)
+    if (!click) {
+      dispatch(setActiveSong({ song, data, i }))
+      dispatch(playPause(true))
+    } else {
+      dispatch(playPause(false))
+    }
+  }
   const handlePauseClick = () => {
     dispatch(playPause(false))
   }
@@ -125,8 +134,8 @@ const SongCard = ({ song, isPlaying, activeSong, data, i }) => {
             isPlaying={isPlaying}
             activeSong={activeSong}
             song={song}
-            handlePause={handlePauseClick}
-            handlePlay={handlePlayClick}
+            handlePause={handleButtonClick}
+            handlePlay={handleButtonClick}
           />
         </div>
         <Image

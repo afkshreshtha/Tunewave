@@ -60,38 +60,47 @@ const LikedSongs = () => {
   }, [])
 
   const songid = likedSongs?.map((song) => song?.songid).join(',')
-  const { data, isFetching: fetching, error } = useGetTopSongsDetailsQuery({ songid })
+  const { data, isFetching: fetching, error } = useGetTopSongsDetailsQuery({
+    songid,
+  })
 
   return (
     <div className="flex flex-col">
       <div className="w-full flex justify-between items-center sm:flex-row flex-col mt-4 mb-10">
         <h2 className="font-bold text-3xl text-white text-left">Liked Songs</h2>
       </div>
-      {isFetching &&( <div className='mt-5'>
-        <div className="text-white text-2xl">Fetching your liked songs...</div>
-      </div>)}
+      {isFetching && (
+        <div className="mt-5">
+          <div className="text-white text-2xl">
+            Fetching your liked songs...
+          </div>
+        </div>
+      )}
       {isFetching ? (
         <div className="flex flex-wrap sm:justify-start justify-center gap-8 mb-20 mt-5">
           {[...Array(6)].map((_, index) => (
-            <SkeletonTheme key={index} baseColor='#343333'>
-
-         
-            <div key={index} className="w-[250px] p-4 bg-white/5 bg-opacity-80 backdrop-blur-sm animate-slideup rounded-lg">
-              <Skeleton height={224} className="w-full h-full rounded-lg" />
-              <div className="mt-4 flex flex-col">
-                <Skeleton height={20} className="mb-2" />
-                <Skeleton height={20} />
-                <div className="mt-4 flex space-x-4">
-                  <Skeleton circle={true} height={20} width={20} />
-                  <Skeleton circle={true} height={20} width={20} />
+            <SkeletonTheme key={index} baseColor="#343333">
+              <div
+                key={index}
+                className="w-[250px] p-4 bg-white/5 bg-opacity-80 backdrop-blur-sm animate-slideup rounded-lg"
+              >
+                <Skeleton height={224} className="w-full h-full rounded-lg" />
+                <div className="mt-4 flex flex-col">
+                  <Skeleton height={20} className="mb-2" />
+                  <Skeleton height={20} />
+                  <div className="mt-4 flex space-x-4">
+                    <Skeleton circle={true} height={20} width={20} />
+                    <Skeleton circle={true} height={20} width={20} />
+                  </div>
                 </div>
               </div>
-            </div>
-   </SkeletonTheme>
+            </SkeletonTheme>
           ))}
         </div>
       ) : data === undefined || data.length === 0 ? (
-        <div className="text-white text-2xl">Please add your favorite songs</div>
+        <div className="text-white text-2xl">
+          Please add your favorite songs
+        </div>
       ) : (
         <div className="flex flex-wrap sm:justify-start justify-center gap-8 mb-20">
           {data?.data?.map((song, i) => (
