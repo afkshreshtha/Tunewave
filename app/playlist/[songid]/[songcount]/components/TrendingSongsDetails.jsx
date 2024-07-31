@@ -1,37 +1,40 @@
 'use client'
 import { useDispatch } from 'react-redux'
 import { playPause, setActiveSong } from '../../../../redux/Features/playerSlice'
-import { useEffect,  useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { supabase } from '../../../../utils/supabase'
 import { AiFillHeart, AiOutlineHeart, AiOutlineDownload } from 'react-icons/ai'
 import gif from '../../../../../public/music.gif'
+
 const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
   const dispatch = useDispatch()
   const [LikedSongsid, setLikedSongsid] = useState([])
   const [IslikedSong, setIsLikedSong] = useState(false)
   const [click, setClick] = useState(false)
-
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false)
 
   const handleButtonClick = () => {
-    setClick((prevState) => !prevState) // Toggle the value of 'click'
-    if (click === false) {
-      dispatch(playPause(false))
-    } else {
+    setClick((prevState) => !prevState)
+    if (!click) {
       dispatch(setActiveSong({ song, data, i }))
       dispatch(playPause(true))
+    } else {
+      dispatch(playPause(false))
     }
   }
-  if (localStorage.getItem('playMusic', 0)) {
-    dispatch(setActiveSong({ song, data, i }))
-    dispatch(playPause(true))
-    localStorage.removeItem('playMusic')
-  }
+
   const decodeHTMLString = (str) => {
-    const decodedString = str?.replace(/&quot;/g, '"')
-    return decodedString
+    return str?.replace(/&quot;/g, '"')
   }
+  useEffect(()=>{
+    if(localStorage.getItem('click')==='true'){
+      const firstSong = song;
+      dispatch(setActiveSong({song:firstSong,data,i:[0]}))
+      dispatch(playPause(false))
+      localStorage.removeItem('click')
+    }
+  },[dispatch,data,song])
 
   let str = song?.name
   str = decodeHTMLString(str)
@@ -49,6 +52,7 @@ const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
     uploadSong(song)
     setIsLikedSong(true)
   }
+
   useEffect(() => {
     async function fetchLikedSongs() {
       try {
@@ -88,6 +92,7 @@ const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
       console.error('Error:', error.message)
     }
   }
+
   const handleLikeSong = () => {
     handleLikeClick(song.id)
   }
@@ -103,10 +108,11 @@ const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
 
     const link = document.createElement('a')
     link.href = url
-    link.download = `${str}` // Set the desired file name
+    link.download = `${str}`
     link.click()
     URL.revokeObjectURL(url)
   }
+
   useEffect(() => {
     const fetchSession = async () => {
       const session = await supabase.auth.getSession()
@@ -117,18 +123,13 @@ const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
     fetchSession()
   }, [])
 
-
-
-
   return (
     <div className="mt-10 mb-10 flex items-center justify-between mr-4">
       <div className="flex items-center">
         <div
           onClick={handleButtonClick}
           className={`cursor-pointer mr-4 ${
-            activeSong?.id === song.id && isPlaying
-              ? 'text-green-400'
-              : 'text-white'
+            activeSong?.id === song.id && isPlaying ? 'text-green-400' : 'text-white'
           }`}
         >
           {str}
@@ -164,7 +165,7 @@ const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
               alt="img"
               width={50}
               height={50}
-              objectFit="contain" // Adjust this based on your design needs
+              objectFit="contain"
             />
           </div>
         </div>
@@ -172,4 +173,5 @@ const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
     </div>
   )
 }
+
 export default TrendingSongsDetails

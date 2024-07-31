@@ -8,7 +8,8 @@ import Image from 'next/image'
 import { useCallback, useRef, useState } from 'react'
 import PlayPause from '../../components/PlayPause'
 import { playPause, setActiveSong } from '../../redux/Features/playerSlice'
-
+import Lyrics from "./components/lyrics"
+import SuggestionSong from "./components/suggestionSong"
 const SongDetails = () => {
   const { songId } = useParams()
   const [click, setClick] = useState(false)
@@ -68,10 +69,16 @@ const SongDetails = () => {
         </div>
       </div>
       <div>
+        <Lyrics songId={songId}/>
+      </div>
+      <div>
         <h3 className="text-white text-2xl font-bold text-center mt-5">
           Artists
         </h3>
         <ArtistDetail data={data?.data[0]?.artists?.all} />
+      </div>
+      <div>
+        <SuggestionSong songId={songId}/>
       </div>
     </div>
   )

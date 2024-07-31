@@ -23,11 +23,14 @@ const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
       dispatch(playPause(true))
     }
   }
-    if (localStorage.getItem('playMusic', 0)) {
-    dispatch(setActiveSong({ song, data, i }))
-    dispatch(playPause(true))
-    localStorage.removeItem('playMusic')
-  }
+  useEffect(()=>{
+    if(localStorage.getItem('click')==='true'){
+      const firstSong = song;
+      dispatch(setActiveSong({song:firstSong,data,i:[0]}))
+      dispatch(playPause(false))
+      localStorage.removeItem('click')
+    }
+  },[dispatch,data,song])
   const decodeHTMLString = (str) => {
     const decodedString = str?.replace(/&quot;/g, '"')
     return decodedString

@@ -11,7 +11,8 @@
   @apply text-cyan-500;
 }  */
 body{
-  background: black;
+  background: rgb(41, 40, 40);
+  overflow-x: hidden;
 }
 .bar:nth-child(2) {
   animation-delay: 0.2s;

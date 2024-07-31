@@ -28,7 +28,7 @@ const Player = ({
         ref.current.pause()
       }
     }
-  }, [isPlaying])
+  }, [isPlaying, dispatch])
 
   useEffect(() => {
     if (ref.current) {
@@ -80,7 +80,9 @@ const Player = ({
           }
           if (navigator.mediaSession) {
             navigator.mediaSession.setPositionState({
-              duration: isFinite(ref.current.duration) ? ref.current.duration : 0,
+              duration: isFinite(ref.current.duration)
+                ? ref.current.duration
+                : 0,
               playbackRate: ref.current.playbackRate,
               position: ref.current.currentTime,
             })
@@ -113,7 +115,6 @@ const Player = ({
             position: ref.current.currentTime,
           })
         }
-        console.log('Duration:', duration)
       }
     }
 

@@ -20,6 +20,12 @@ export const jioSavaanapi = createApi({
     getNewReleasesDetails: builder.query({
       query: ({ songid }) => `/albums?id=${songid}`,
     }),
+    getLyrics: builder.query({
+      query: ({ songid }) => `/songs/${songid}/lyrics`,
+    }),
+    getSuggestion: builder.query({
+      query: ({ songid }) => `/songs/${songid}/suggestions`,
+    }),
     getSongsBySearch: builder.query({
       query: (searchTerm) => `/search/songs?query=${searchTerm}`,
     }),
@@ -32,4 +38,6 @@ export const {
   useGetTopSongsDetailsQuery,
   useGetNewReleasesDetailsQuery,
   useGetSongsBySearchQuery,
+  useGetLyricsQuery,
+  useGetSuggestionQuery
 } = jioSavaanapi;
