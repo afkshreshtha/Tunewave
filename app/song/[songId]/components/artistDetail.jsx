@@ -30,7 +30,7 @@ const ArtistDetail = ({ data }) => {
   }
 
   return (
-    <div className="artist-carousel max-w-[30rem]  lg:max-w-[40rem] mx-auto overflow-y-hidden">
+    <div className="artist-carousel max-w-[20rem] sm:max-w-[30rem]  lg:max-w-[40rem] mx-auto overflow-y-hidden">
       <Carousel responsive={responsive} className="text-white">
         {data.map((artist, index) => (
           <div key={index} className="text-center p-4">
