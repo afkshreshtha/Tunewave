@@ -71,14 +71,15 @@ export async function POST(req, res) {
     return new NextResponse('Unexpected error during processing', {
       status: 500,
     })
-  } finally {
-    // Ensure files are properly deleted
-    try {
-      fs.unlinkSync(audioFilePath)
-      fs.unlinkSync(imageFilePath)
-      fs.unlinkSync(mp3FilePath)
-    } catch (err) {
-      console.error('Error deleting files:', err)
-    }
   }
+  //  finally {
+  //   // Ensure files are properly deleted
+  //   try {
+  //     fs.unlinkSync(audioFilePath)
+  //     fs.unlinkSync(imageFilePath)
+  //     fs.unlinkSync(mp3FilePath)
+  //   } catch (err) {
+  //     console.error('Error deleting files:', err)
+  //   }
+  // }
 }
