@@ -62,7 +62,7 @@ const TrendingSongsDetails = ({ song, i, data }) => {
             imageUrl:coverImageUrl,
             artists:artists,
             album:album,
-         
+            filename:filename
         }, {
             responseType: 'blob', // Ensure this matches the response from the server
         });
