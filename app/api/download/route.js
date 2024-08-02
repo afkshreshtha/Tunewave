@@ -11,7 +11,7 @@ const execPromise = promisify(exec)
 export async function POST(req, res) {
   let payload = await req.json()
   const { audioUrl, imageUrl, artists, filename } = payload
-  const tempDir = path.join(process.cwd(), 'tmp')
+  const tempDir ='/tmp'
   if (!fs.existsSync(tempDir)) {
     fs.mkdirSync(tempDir)
   }
@@ -78,14 +78,5 @@ export async function POST(req, res) {
     return new NextResponse('Unexpected error during processing', {
       status: 500,
     })
-  } finally {
-    // Ensure files are properly deleted
-    try {
-      fs.unlinkSync(audioFilePath)
-      fs.unlinkSync(imageFilePath)
-      fs.unlinkSync(mp3FilePath)
-    } catch (err) {
-      console.error('Error deleting files:', err)
-    }
-  }
+  } 
 }
