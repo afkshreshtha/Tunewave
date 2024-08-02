@@ -31,8 +31,7 @@ const Discover = () => {
              <Skeleton height={150} width={150}  />
              <Skeleton height={20} width={150} className="mt-4" />
              <Skeleton height={20} width={150} className="mt-4" />
-             </SkeletonTheme>
-         
+             </SkeletonTheme>        
             </div>
           ))
         ) : (

@@ -10,6 +10,8 @@ import { supabase } from '../../../utils/supabase'
 import { AiFillHeart, AiOutlineHeart, AiOutlineDownload } from 'react-icons/ai'
 import gif from '../../../../public/music.gif'
 import PlayPause from '../../../components/PlayPause'
+import axios from 'axios'
+
 
 const TrendingSongsDetails = ({ song, i, data }) => {
   const dispatch = useDispatch()
@@ -48,17 +50,42 @@ const TrendingSongsDetails = ({ song, i, data }) => {
     setIsLikedSong(!isLikedSong)
   }
 
-  const handleDownload = async () => {
-    const response = await fetch(downloadURL)
-    const blob = await response.blob()
-    const url = URL.createObjectURL(blob)
 
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `${str}`
-    link.click()
-    URL.revokeObjectURL(url)
-  }
+  const handleDownload = async () => {
+    const artists = song.artists.primary.map((e)=>e.name);
+    try {
+      const downloadURL = song.downloadUrl[4]?.url;
+      const coverImageUrl = song.image[2]?.url;
+      const filename = `${str}`;
+      // const artists = song.artists.primary.all.name;
+  
+      
+  
+      const response = await axios.post('/api/download', {
+        audioUrl: downloadURL,
+        imageUrl: coverImageUrl,
+        filename: filename,
+        artists: artists,
+      }, {
+        responseType: 'blob',
+      });
+  
+      if (response.data) {
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${filename}.mp3`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        console.error('Error in API response:', response.data.error);
+      }
+    } catch (error) {
+      console.error('Error during download:', error);
+    }
+  };
+  
 
   useEffect(() => {
     const fetchLikedSongs = async () => {
@@ -85,28 +112,22 @@ const TrendingSongsDetails = ({ song, i, data }) => {
     fetchSession()
   }, [])
 
-  const handlePauseClick = () => {
-    dispatch(playPause(false))
-  }
-
-  const handlePlayClick = () => {
-    dispatch(setActiveSong({ song, data, i }))
-    dispatch(playPause(true))
-  }
   const handleButtonClick = () => {
-    setClick((prevState) => !prevState)
-    if (!click) {
+    setClick(true)
+    if (click) {
       dispatch(setActiveSong({ song, data, i }))
       dispatch(playPause(true))
+       setClick(false)
     } else {
       dispatch(playPause(false))
+     
     }
   }
   return (
     <div className="p-4">
       <div className="bg-gray-800 text-white rounded-lg shadow-lg">
         {/* Image Section */}
-        <div className="relative w-full h-48 group" onClick={handleButtonClick}>
+        <div className="relative w-full h-48 group" onClick={handleButtonClick} >
           <Image
             unoptimized={true}
             src={
@@ -127,13 +148,11 @@ const TrendingSongsDetails = ({ song, i, data }) => {
                 : 'bg-black bg-opacity-50'
             }`}
           >
-            {/* <PlayPause
+            <PlayPause
               isPlaying={isPlaying}
               activeSong={activeSong}
               song={song}
-              handlePause={handlePauseClick}
-              handlePlay={handlePlayClick}
-            /> */}
+            />
           </div>
         </div>
 

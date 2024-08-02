@@ -15,15 +15,14 @@ const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false)
 
   const handleButtonClick = () => {
-    setClick((prevState) => !prevState)
-    if (!click) {
+    setClick((prevState) => !prevState) // Toggle the value of 'click'
+    if (click === false) {
+      dispatch(playPause(false))
+    } else {
       dispatch(setActiveSong({ song, data, i }))
       dispatch(playPause(true))
-    } else {
-      dispatch(playPause(false))
     }
   }
-
   const decodeHTMLString = (str) => {
     return str?.replace(/&quot;/g, '"')
   }
