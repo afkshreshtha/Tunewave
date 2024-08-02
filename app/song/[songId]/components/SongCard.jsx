@@ -21,8 +21,6 @@ const TrendingSongsDetails = ({ song, i, data }) => {
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false)
   const decodeHTMLString = (str) => str?.replace(/&quot;/g, '"')
   const str = decodeHTMLString(song?.name)
-  const downloadURL = song.downloadUrl[4]?.url
-
   const uploadSong = async (song) => {
     const user = await supabase.auth.getUser()
     const formattedSongs = {

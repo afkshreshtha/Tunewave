@@ -10,7 +10,7 @@ export async function POST(req, res) {
   let payload = await req.json()
   const { audioUrl, imageUrl, artists, filename } = payload
   console.log(artists)
-  const tempDir = path.join(process.cwd(), 'tmp')
+  const tempDir ='/tmp'
   if (!fs.existsSync(tempDir)) {
     fs.mkdirSync(tempDir)
   }
