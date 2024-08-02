@@ -50,40 +50,40 @@ const TrendingSongsDetails = ({ song, i, data }) => {
 
 
   const handleDownload = async () => {
-    const artists = song.artists.primary.map((e)=>e.name);
+    const artists = song.artists.primary.map((e) => e.name);
+    const album = song.album.name;
     try {
-      const downloadURL = song.downloadUrl[4]?.url;
-      const coverImageUrl = song.image[2]?.url;
-      const filename = `${str}`;
-      // const artists = song.artists.primary.all.name;
-  
-      
-  
-      const response = await axios.post('/api/download', {
-        audioUrl: downloadURL,
-        imageUrl: coverImageUrl,
-        filename: filename,
-        artists: artists,
-      }, {
-        responseType: 'blob',
-      });
-  
-      if (response.data) {
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `${filename}.mp3`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } else {
-        console.error('Error in API response:', response.data.error);
-      }
+        const downloadURL = song.downloadUrl[4]?.url;
+        const coverImageUrl = song.image[2]?.url;
+        const filename = `${str}`; // Use a timestamp or unique identifier for filename
+
+        const response = await axios.post('/api/cron', {
+            audioUrl: downloadURL,
+            imageUrl:coverImageUrl,
+            artists:artists,
+            album:album,
+         
+        }, {
+            responseType: 'blob', // Ensure this matches the response from the server
+        });
+
+        if (response.data) {
+            const url = window.URL.createObjectURL(new Blob([response.data], { type: 'audio/mpeg' }));
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${filename}.mp3`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url); // Clean up the URL object
+        } else {
+            console.error('Error in API response:', response.data.error);
+        }
     } catch (error) {
-      console.error('Error during download:', error);
+        console.error('Error during download:', error);
     }
-  };
-  
+};
+
 
   useEffect(() => {
     const fetchLikedSongs = async () => {
