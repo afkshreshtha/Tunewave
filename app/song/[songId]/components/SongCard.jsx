@@ -11,7 +11,7 @@ import { AiFillHeart, AiOutlineHeart, AiOutlineDownload } from 'react-icons/ai'
 import gif from '../../../../public/music.gif'
 import PlayPause from '../../../components/PlayPause'
 import axios from 'axios'
-
+import { toast } from 'react-toastify';
 
 const TrendingSongsDetails = ({ song, i, data }) => {
   const dispatch = useDispatch()
@@ -49,15 +49,18 @@ const TrendingSongsDetails = ({ song, i, data }) => {
   }
 
 
+
+
   const handleDownload = async () => {
     const artists = song.artists.primary.map((e) => e.name);
     const album = song.album.name;
-    try {
+    const filename = `${str}`; // Use a timestamp or unique identifier for filename
+
+    const downloadPromise = async () => {
       const downloadURL = song.downloadUrl[4]?.url;
       const coverImageUrl = song.image[2]?.url;
-      const filename = `${str}`; // Use a timestamp or unique identifier for filename
-  
-      const response = await axios.post('https://audichangerr.netlify.app/.netlify/functions/api', {
+
+      const response = await axios.post('https://audio-changer.onrender.com/convert', {
         audioUrl: downloadURL,
         imageUrl: coverImageUrl,
         artists: artists,
@@ -68,7 +71,7 @@ const TrendingSongsDetails = ({ song, i, data }) => {
         },
         responseType: 'blob', // Ensure this matches the response from the server
       });
-  
+
       if (response.data) {
         const url = window.URL.createObjectURL(new Blob([response.data], { type: 'audio/mpeg' }));
         const link = document.createElement('a');
@@ -78,15 +81,33 @@ const TrendingSongsDetails = ({ song, i, data }) => {
         link.click();
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url); // Clean up the URL object
+        return 'Download complete!';
       } else {
-        console.error('Error in API response:', response.data.error);
+        throw new Error('Error in API response: ' + response.data.error);
       }
-    } catch (error) {
-      console.error('Error during download:', error);
-    }
+    };
+
+    toast.promise(
+      downloadPromise(),
+      {
+        pending: 'Download in progress...',
+        success: 'Download complete!',
+        error: {
+          render({ data }) {
+            return `Error during download: ${data.message}`;
+          }
+        }
+      },
+      {
+        position: "top-right",
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      }
+    );
   };
   
-
   useEffect(() => {
     const fetchLikedSongs = async () => {
       try {
