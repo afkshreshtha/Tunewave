@@ -7,6 +7,8 @@ import { playPause, setActiveSong } from '../../redux/Features/playerSlice'
 import Image from 'next/image'
 import { AiFillHeart, AiOutlineDownload, AiOutlineHeart } from 'react-icons/ai'
 import { supabase } from '../../utils/supabase'
+import axios from 'axios'
+import { toast } from 'react-toastify'
 
 const SongCard = ({ song, isPlaying, activeSong, data, i }) => {
   const dispatch = useDispatch()
@@ -37,20 +39,62 @@ const SongCard = ({ song, isPlaying, activeSong, data, i }) => {
   let str = song.name || song.title
   str = decodeHTMLString(str)
   const router = useRouter()
-  const downloadURL = song.downloadUrl[4]?.url
-
   const handleDownload = async () => {
-    const response = await fetch(downloadURL)
-    const blob = await response.blob()
-    const url = URL.createObjectURL(blob)
+    const artists = song.artists.primary.map((e) => e.name);
+    const album = song.album.name;
+    const filename = `${str}`; // Use a timestamp or unique identifier for filename
 
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `${str}`
-    link.click()
-    URL.revokeObjectURL(url)
-  }
+    const downloadPromise = async () => {
+      const downloadURL = song.downloadUrl[4]?.url;
+      const coverImageUrl = song.image[2]?.url;
 
+      const response = await axios.post('https://audio-changer.onrender.com/convert', {
+        audioUrl: downloadURL,
+        imageUrl: coverImageUrl,
+        artists: artists,
+        album: album,
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        responseType: 'blob', // Ensure this matches the response from the server
+      });
+
+      if (response.data) {
+        const url = window.URL.createObjectURL(new Blob([response.data], { type: 'audio/mpeg' }));
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${filename}.mp3`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url); // Clean up the URL object
+        return 'Download complete!';
+      } else {
+        throw new Error('Error in API response: ' + response.data.error);
+      }
+    };
+
+    toast.promise(
+      downloadPromise(),
+      {
+        pending: 'Download in progress...',
+        success: 'Download complete!',
+        error: {
+          render({ data }) {
+            return `Error during download: ${data.message}`;
+          }
+        }
+      },
+      {
+        position: "top-right",
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      }
+    );
+  };
   const uploadSong = async (song) => {
     const user = await supabase.auth.getUser()
     const formattedSongs = {
