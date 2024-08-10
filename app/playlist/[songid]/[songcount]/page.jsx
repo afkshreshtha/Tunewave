@@ -31,17 +31,25 @@ const SongDetails = () => {
   const observer = useRef()
   const lastBookElementRef = useCallback(
     (node) => {
-      if (loading) return
-      if (observer.current) observer.current.disconnect()
+      if (loading) return;
+  
+      if (observer.current) observer.current.disconnect();
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
-          setPage((prevPage) => prevPage + 1)
+          const scrollPosition = window.scrollY;  // Capture scroll position
+  
+          setPage((prevPage) => prevPage + 1);
+  
+          // Restore scroll position after state update
+          setTimeout(() => {
+            window.scrollTo(0, scrollPosition);
+          }, 0);
         }
-      })
-      if (node) observer.current.observe(node)
+      });
+      if (node) observer.current.observe(node);
     },
     [loading, hasMore],
-  )
+  );
 
   if (isFetching) {
     return (

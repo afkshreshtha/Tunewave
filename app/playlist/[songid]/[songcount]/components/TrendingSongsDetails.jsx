@@ -1,6 +1,9 @@
 'use client'
 import { useDispatch } from 'react-redux'
-import { playPause, setActiveSong } from '../../../../redux/Features/playerSlice'
+import {
+  playPause,
+  setActiveSong,
+} from '../../../../redux/Features/playerSlice'
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { supabase } from '../../../../utils/supabase'
@@ -11,42 +14,42 @@ import axios from 'axios'
 
 const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
   const dispatch = useDispatch()
-  const [LikedSongsid, setLikedSongsid] = useState([])
-  const [IslikedSong, setIsLikedSong] = useState(false)
+  const [likedSongsId, setLikedSongsId] = useState([])
+  const [isLikedSong, setIsLikedSong] = useState(false)
   const [click, setClick] = useState(false)
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false)
 
   const handleButtonClick = () => {
-    setClick((prevState) => !prevState) // Toggle the value of 'click'
-    if (click === false) {
+    setClick((prevState) => !prevState)
+    if (click) {
       dispatch(playPause(false))
     } else {
       dispatch(setActiveSong({ song, data, i }))
       dispatch(playPause(true))
     }
   }
+
   const decodeHTMLString = (str) => {
     return str?.replace(/&quot;/g, '"')
   }
-  useEffect(()=>{
-    if(localStorage.getItem('click')==='true'){
-      const firstSong = song;
-      dispatch(setActiveSong({song:firstSong,data,i:[0]}))
+
+  useEffect(() => {
+    if (localStorage.getItem('click') === 'true') {
+      dispatch(setActiveSong({ song, data, i: 0 }))
       dispatch(playPause(false))
       localStorage.removeItem('click')
     }
-  },[dispatch,data,song])
+  }, [dispatch, data, song])
 
-  let str = song?.name
-  str = decodeHTMLString(str)
+  let str = decodeHTMLString(song?.name)
 
   const uploadSong = async (song) => {
     const user = await supabase.auth.getUser()
-    const formattedSongs = {
+    const formattedSong = {
       songid: song.id,
       user_id: user.data.user.id,
     }
-    await supabase.from('likedsongs').upsert(formattedSongs)
+    await supabase.from('likedsongs').upsert(formattedSong)
   }
 
   const handleClick = () => {
@@ -55,7 +58,7 @@ const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
   }
 
   useEffect(() => {
-    async function fetchLikedSongs() {
+    const fetchLikedSongs = async () => {
       try {
         const user = await supabase.auth.getUser()
         const { data, error } = await supabase
@@ -66,7 +69,7 @@ const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
         if (error) {
           console.error('Error fetching liked songs:', error.message)
         } else {
-          setLikedSongsid(data)
+          setLikedSongsId(data.map((item) => item.songid))
         }
       } catch (error) {
         console.error('Error:', error.message)
@@ -75,95 +78,79 @@ const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
     fetchLikedSongs()
   }, [])
 
-  const handleLikeClick = async (songid) => {
+  const handleLikeClick = async (songId) => {
     const user = await supabase.auth.getUser()
     try {
       const { data, error } = await supabase
         .from('likedsongs')
         .delete()
         .eq('user_id', user.data.user.id)
-        .eq('songid', songid)
+        .eq('songid', songId)
 
       if (error) {
         console.error('Error deleting liked song:', error.message)
       } else {
-        setLikedSongsid(data)
+        setLikedSongsId((prev) => prev.filter((id) => id !== songId))
       }
     } catch (error) {
       console.error('Error:', error.message)
     }
   }
 
-  const handleLikeSong = () => {
-    handleLikeClick(song.id)
-  }
-
-  const l = LikedSongsid?.map((song) => song?.songid)
-  const a = l?.includes(song?.id)
-
   const handleDownload = async () => {
-    const artists = song.artists.primary.map((e) => e.name);
-    const album = song.album.name;
-    const filename = `${str}`; // Use a timestamp or unique identifier for filename
+    const downloadURL = song.downloadUrl[4]?.url
+    const coverImageUrl = song.image[2]?.url
+    const artists = song.artists.primary.map((e) => e.name).join(', ')
+    const album = song.album.name
+    const filename = str
 
-    const downloadPromise = async () => {
-      const downloadURL = song.downloadUrl[4]?.url;
-      const coverImageUrl = song.image[2]?.url;
+    const dataToSend = { downloadURL, coverImageUrl, artists, album, filename }
+    const queryParams = new URLSearchParams(dataToSend).toString()
 
-      const response = await axios.post('https://audio-changer.onrender.com/convert', {
-        audioUrl: downloadURL,
-        imageUrl: coverImageUrl,
-        artists: artists,
-        album: album,
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        responseType: 'blob', // Ensure this matches the response from the server
-      });
-
+    try {
+      // Ensure the responseType is set correctly for blob data
+      const response = await axios.post(`/api/convert?${queryParams}`, null, {
+        responseType: 'blob',
+      })
+      console.log(response.data)
       if (response.data) {
-        const url = window.URL.createObjectURL(new Blob([response.data], { type: 'audio/mpeg' }));
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `${filename}.mp3`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url); // Clean up the URL object
-        return 'Download complete!';
-      } else {
-        throw new Error('Error in API response: ' + response.data.error);
-      }
-    };
+        // Create a Blob from the response data
+        const url = window.URL.createObjectURL(
+          new Blob([response.data], { type: 'audio/mpeg' }),
+        )
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `${filename}.mp3` // Set the filename with .mp3 extension
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(url) // Clean up the URL object
 
-    toast.promise(
-      downloadPromise(),
-      {
-        pending: 'Download in progress...',
-        success: 'Download complete!',
-        error: {
-          render({ data }) {
-            return `Error during download: ${data.message}`;
-          }
-        }
-      },
-      {
-        position: "top-right",
+        toast.success('Download complete!', {
+          position: 'top-right',
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        })
+      } else {
+        throw new Error('Error in API response: ' + response.data.error)
+      }
+    } catch (error) {
+      toast.error(`Error during download: ${error.message}`, {
+        position: 'top-right',
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
-      }
-    );
-  };
+      })
+    }
+  }
 
   useEffect(() => {
     const fetchSession = async () => {
-      const session = await supabase.auth.getSession()
-      if (session?.data.session === null) {
-        setIsUserLoggedIn(true)
-      }
+      const { data } = await supabase.auth.getSession()
+      setIsUserLoggedIn(!!data?.session)
     }
     fetchSession()
   }, [])
@@ -174,7 +161,9 @@ const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
         <div
           onClick={handleButtonClick}
           className={`cursor-pointer mr-4 ${
-            activeSong?.id === song.id && isPlaying ? 'text-green-400' : 'text-white'
+            activeSong?.id === song.id && isPlaying
+              ? 'text-green-400'
+              : 'text-white'
           }`}
         >
           {str}
@@ -185,8 +174,8 @@ const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
       <div className="flex items-center">
         {!isUserLoggedIn && (
           <div className="text-white mr-2 cursor-pointer">
-            {IslikedSong || a ? (
-              <AiFillHeart onClick={handleLikeSong} />
+            {isLikedSong || likedSongsId.includes(song.id) ? (
+              <AiFillHeart onClick={() => handleLikeClick(song.id)} />
             ) : (
               <AiOutlineHeart onClick={handleClick} />
             )}

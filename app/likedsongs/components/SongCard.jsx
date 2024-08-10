@@ -25,14 +25,6 @@ const SongCard = ({ song, isPlaying, activeSong, data, i }) => {
       dispatch(playPause(false))
     }
   }
-  const handlePauseClick = () => {
-    dispatch(playPause(false))
-  }
-
-  const handlePlayClick = () => {
-    dispatch(setActiveSong({ song, data, i }))
-    dispatch(playPause(true))
-  }
 
   const decodeHTMLString = (str) => str?.replace(/&quot;/g, '"')
 
@@ -40,40 +32,47 @@ const SongCard = ({ song, isPlaying, activeSong, data, i }) => {
   str = decodeHTMLString(str)
   const router = useRouter()
   const handleDownload = async () => {
-    const artists = song.artists.primary.map((e) => e.name);
-    const album = song.album.name;
-    const filename = `${str}`; // Use a timestamp or unique identifier for filename
+    const artists = song.artists.primary.map((e) => e.name)
+    const album = song.album.name
+    const filename = `${str}` // Use a timestamp or unique identifier for filename
 
     const downloadPromise = async () => {
-      const downloadURL = song.downloadUrl[4]?.url;
-      const coverImageUrl = song.image[2]?.url;
+      const downloadURL = song.downloadUrl[4]?.url
+      const coverImageUrl = song.image[2]?.url
 
-      const response = await axios.post('https://audio-changer.onrender.com/convert', {
-        audioUrl: downloadURL,
-        imageUrl: coverImageUrl,
-        artists: artists,
-        album: album,
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await axios.post(
+        'https://audio-changer.onrender.com/convert',
+        {
+          audioUrl: downloadURL,
+          imageUrl: coverImageUrl,
+          artists: artists,
+          album: album,
         },
-        responseType: 'blob', // Ensure this matches the response from the server
-      });
-
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          responseType: 'blob', // Ensure this matches the response from the server
+        },
+      )
+      console.log(response.data)
       if (response.data) {
-        const url = window.URL.createObjectURL(new Blob([response.data], { type: 'audio/mpeg' }));
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `${filename}.mp3`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url); // Clean up the URL object
-        return 'Download complete!';
+        const url = window.URL.createObjectURL(
+          new Blob([response.data], { type: 'audio/mpeg' }),
+        )
+        console.log(url)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `${filename}.mp3`
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+        window.URL.revokeObjectURL(url) // Clean up the URL object
+        return 'Download complete!'
       } else {
-        throw new Error('Error in API response: ' + response.data.error);
+        throw new Error('Error in API response: ' + response.data.error)
       }
-    };
+    }
 
     toast.promise(
       downloadPromise(),
@@ -82,19 +81,19 @@ const SongCard = ({ song, isPlaying, activeSong, data, i }) => {
         success: 'Download complete!',
         error: {
           render({ data }) {
-            return `Error during download: ${data.message}`;
-          }
-        }
+            return `Error during download: ${data.message}`
+          },
+        },
       },
       {
-        position: "top-right",
+        position: 'top-right',
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
-      }
-    );
-  };
+      },
+    )
+  }
   const uploadSong = async (song) => {
     const user = await supabase.auth.getUser()
     const formattedSongs = {
@@ -194,16 +193,18 @@ const SongCard = ({ song, isPlaying, activeSong, data, i }) => {
 
       <div className="mt-4 flex flex-col">
         <p className="font-semibold text-lg text-white truncate">{str}</p>
-        <p className="font-semibold text-lg text-white truncate">{song.subtitle}</p>
+        <p className="font-semibold text-lg text-white truncate">
+          {song.subtitle}
+        </p>
         <div className="flex items-center space-x-4 mt-2">
-          <div
-            className="text-white cursor-pointer"
-            onClick={handleDownload}
-          >
+          <div className="text-white cursor-pointer" onClick={handleDownload}>
             <AiOutlineDownload size={20} />
           </div>
           {isUserLoggedIn && (
-            <div className="text-white cursor-pointer" onClick={isSongLiked ? handleLikeSong : handleClick}>
+            <div
+              className="text-white cursor-pointer"
+              onClick={isSongLiked ? handleLikeSong : handleClick}
+            >
               {isSongLiked || isLikedSong ? (
                 <AiFillHeart size={20} />
               ) : (
