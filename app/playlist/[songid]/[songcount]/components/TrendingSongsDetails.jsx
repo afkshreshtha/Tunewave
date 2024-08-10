@@ -98,53 +98,67 @@ const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
   }
 
   const handleDownload = async () => {
-    const downloadURL = song.downloadUrl[4]?.url
-    const coverImageUrl = song.image[2]?.url
-    const artists = song.artists.primary.map((e) => e.name).join(', ')
+    const artists = song.artists.primary.map((e) => e.name)
     const album = song.album.name
-    const filename = str
+    const filename = `${str}` // Use a timestamp or unique identifier for filename
 
-    const dataToSend = { downloadURL, coverImageUrl, artists, album, filename }
-    const queryParams = new URLSearchParams(dataToSend).toString()
+    const downloadPromise = async () => {
+      const downloadURL = song.downloadUrl[4]?.url
+      const coverImageUrl = song.image[2]?.url
 
-    try {
-      // Ensure the responseType is set correctly for blob data
-      const response = await axios.post(`/api/convert?${queryParams}`, null, {
-        responseType: 'blob',
-      })
+      const response = await axios.post(
+        'https://audio-changer.onrender.com/convert',
+        {
+          audioUrl: downloadURL,
+          imageUrl: coverImageUrl,
+          artists: artists,
+          album: album,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          responseType: 'blob', // Ensure this matches the response from the server
+        },
+      )
       console.log(response.data)
       if (response.data) {
-        // Create a Blob from the response data
         const url = window.URL.createObjectURL(
           new Blob([response.data], { type: 'audio/mpeg' }),
         )
+        console.log(url)
         const link = document.createElement('a')
         link.href = url
-        link.download = `${filename}.mp3` // Set the filename with .mp3 extension
+        link.download = `${filename}.mp3`
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
         window.URL.revokeObjectURL(url) // Clean up the URL object
-
-        toast.success('Download complete!', {
-          position: 'top-right',
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        })
+        return 'Download complete!'
       } else {
         throw new Error('Error in API response: ' + response.data.error)
       }
-    } catch (error) {
-      toast.error(`Error during download: ${error.message}`, {
+    }
+
+    toast.promise(
+      downloadPromise(),
+      {
+        pending: 'Download in progress...',
+        success: 'Download complete!',
+        error: {
+          render({ data }) {
+            return `Error during download: ${data.message}`
+          },
+        },
+      },
+      {
         position: 'top-right',
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
-      })
-    }
+      },
+    )
   }
 
   useEffect(() => {
@@ -172,7 +186,7 @@ const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
       </div>
 
       <div className="flex items-center">
-        {!isUserLoggedIn && (
+        {isUserLoggedIn && (
           <div className="text-white mr-2 cursor-pointer">
             {isLikedSong || likedSongsId.includes(song.id) ? (
               <AiFillHeart onClick={() => handleLikeClick(song.id)} />
