@@ -1,5 +1,5 @@
 'use client'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useStore } from 'react-redux'
 import {
   playPause,
   setActiveSong,
@@ -14,6 +14,7 @@ import axios from 'axios'
 
 const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
   const dispatch = useDispatch()
+
   const [likedSongsId, setLikedSongsId] = useState([])
   const [isLikedSong, setIsLikedSong] = useState(false)
   const [click, setClick] = useState(false)
@@ -98,7 +99,10 @@ const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
   }
 
   const handleDownload = async () => {
-    const artists = song.artists.primary.map((e) => e.name)
+    // Fetch lyrics using useGetLyricsQuery
+
+    // Get the lyrics from the query
+    const artists = song.artists.primary.map((e) => e.name).join(', ') // Join artist names
     const album = song.album.name
     const filename = `${str}` // Use a timestamp or unique identifier for filename
 
@@ -106,37 +110,38 @@ const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
       const downloadURL = song.downloadUrl[4]?.url
       const coverImageUrl = song.image[2]?.url
 
-      const response = await axios.post(
-        'https://audio-changer.onrender.com/convert',
-        {
-          audioUrl: downloadURL,
-          imageUrl: coverImageUrl,
-          artists: artists,
-          album: album,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          responseType: 'blob', // Ensure this matches the response from the server
-        },
-      )
-      console.log(response.data)
-      if (response.data) {
-        const url = window.URL.createObjectURL(
-          new Blob([response.data], { type: 'audio/mpeg' }),
-        )
-        console.log(url)
-        const link = document.createElement('a')
-        link.href = url
-        link.download = `${filename}.mp3`
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        window.URL.revokeObjectURL(url) // Clean up the URL object
-        return 'Download complete!'
-      } else {
-        throw new Error('Error in API response: ' + response.data.error)
+      const dataToSend = {
+        downloadURL,
+        coverImageUrl,
+        artists,
+        album,
+        filename,
+        // Include the fetched lyrics in the data to send
+      }
+      const queryParams = new URLSearchParams(dataToSend).toString()
+
+      try {
+        const response = await axios.post(`/api/convert?${queryParams}`, null, {
+          responseType: 'blob',
+        })
+
+        if (response.data) {
+          const url = window.URL.createObjectURL(
+            new Blob([response.data], { type: 'audio/mpeg' }),
+          )
+          const link = document.createElement('a')
+          link.href = url
+          link.download = `${filename}.mp3`
+          document.body.appendChild(link)
+          link.click()
+          document.body.removeChild(link)
+          window.URL.revokeObjectURL(url) // Clean up the URL object
+          return 'Download complete!'
+        } else {
+          throw new Error('Error in API response: ' + response.data.error)
+        }
+      } catch (error) {
+        throw new Error(error.message)
       }
     }
 
@@ -197,7 +202,9 @@ const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
         )}
         <div
           className="text-white mr-[10px] cursor-pointer"
-          onClick={handleDownload}
+          onClick={() => {
+            handleDownload()
+          }}
         >
           <AiOutlineDownload size={20} />
         </div>

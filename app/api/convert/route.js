@@ -27,6 +27,7 @@ export async function POST(req, res) {
       .outputOptions('-metadata:s:v', 'comment="Cover (front)"')
       .outputOptions('-metadata', `artist=${artists}`)
       .outputOptions('-metadata', `album=${album}`)
+      .outputOptions('-b:a', '320k')
       .output(`${filename}.mp3`)
       .runAndWait()
 
