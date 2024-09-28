@@ -19,7 +19,7 @@ const useSongSearch = (query, pageNumber,searchThing) => {
     setError(false)
     axios
       .get(
-        `https://saavn.dev/api/search/${searchThing}?query=${query}&page=${pageNumber}&limit=10`,
+        `https://tunewaveapi.vercel.app/api/search/${searchThing}?query=${query}&page=${pageNumber}&limit=10`,
       )
       .then((res) => {
         setSongs((prevSongs) => {
