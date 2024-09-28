@@ -18,28 +18,23 @@ const TrendingSongsDetails = ({ song, i, isPlaying, activeSong, data }) => {
   const [isLikedSong, setIsLikedSong] = useState(false)
   const [click, setClick] = useState(false)
   const [isUserLoggedIn, setIsUserLoggedIn] = useState(false)
-
+  
   const handleButtonClick = () => {
-    setClick((prevState) => !prevState)
+    setClick(true)
     if (click) {
-      dispatch(playPause(false))
-    } else {
       dispatch(setActiveSong({ song, data, i }))
       dispatch(playPause(true))
+    } else {
+      dispatch(playPause(false))
     }
   }
+  useEffect(() => {
+    setClick(false)
+  }, [activeSong])
 
   const decodeHTMLString = (str) => {
     return str?.replace(/&quot;/g, '"')
   }
-
-  useEffect(() => {
-    if (localStorage.getItem('click') === 'true') {
-      dispatch(setActiveSong({ song, data, i: 0 }))
-      dispatch(playPause(false))
-      localStorage.removeItem('click')
-    }
-  }, [dispatch, data, song])
 
   let str = decodeHTMLString(song?.name)
 
