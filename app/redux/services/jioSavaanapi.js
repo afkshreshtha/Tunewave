@@ -5,7 +5,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const jioSavaanapi = createApi({
   reducerPath: "jioSavaanapi",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://tunewaveapi.vercel.app/api",
+    baseUrl: "https://music-api-nine-nu.vercel.app/api",
   }),
   endpoints: (builder) => ({
     getTopCharts: builder.query({

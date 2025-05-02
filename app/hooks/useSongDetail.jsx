@@ -21,7 +21,7 @@ const usePlaylist = (query, pageNumber, searchThing) => {
 
     axios
       .get(
-        `https://tunewaveapi.vercel.app/api/playlists?id=${query}&page=${pageNumber}&limit=10`,
+        `https://music-api-nine-nu.vercel.app/api/playlists?id=${query}&page=${pageNumber}&limit=10`,
       )
       .then((res) => {
         setSongs((prevSongs) => {
